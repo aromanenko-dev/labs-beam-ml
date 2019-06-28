@@ -1,0 +1,5 @@
+apache-beam==2.13.0
+black==19.3b0
+scikit-learn==0.21.2
+# this is only for dev reasons
+ipython==7.5
