@@ -5,18 +5,33 @@ Simple example of how to integrate a Python based PTransform in an Apache Beam J
 
 For this example we will integrate a simple scikit based top k-means algorithm as proof of concept but this can be applied to other libraries.
 
+# Execution
+
+TODO
+
 # Developer info
 
-You should have a working Python and Java development environment.
+You should have a working environment with:
+
+- Java 8
+- Python 3.7.x
 
 ## Java
 
-    cd java
     mvn clean install
 
-## Python setup
+Please auto format your code by using the Google Java Style plugin or spotless.
+
+## Python
 
 This code has only been tested with Python 3.7.x
+
+### Prepare a virtualenv for the project
+
+    python3 -m venv ~/.virtualenvs/python3/labs-beam-ml
+    source ~/.virtualenvs/python3/labs-beam-ml/bin/activate
+
+### Install the project dependencies
 
     cd python
     pip install -r requirements.txt
@@ -24,6 +39,4 @@ This code has only been tested with Python 3.7.x
 You can auto-format the code by running:
     
     black .
-
-# Execution
 
