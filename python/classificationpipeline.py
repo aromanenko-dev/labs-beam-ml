@@ -1,5 +1,5 @@
 import apache_beam as beam
-import genreclassifier as genreclassifier
+import talend.labs.beam.ml.genreclassifier as genreclassifier
 import random
 
 from apache_beam.options.pipeline_options import PipelineOptions
