@@ -1,3 +1,4 @@
 black==19.3b0
-ipython==7.5
-mypy==0.710
+cython==0.29.14
+ipython==7.11.1
+mypy==0.761

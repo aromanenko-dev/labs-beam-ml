@@ -1,2 +1,2 @@
 apache-beam==2.17.0
-scikit-learn==0.21.3
+scikit-learn==0.22.1
