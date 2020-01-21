@@ -40,3 +40,23 @@ You can auto-format the code by running:
     
     black .
 
+# Execute code
+
+
+## Java only
+
+    cd java
+
+Direct Runner
+
+    mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pdirect-runner -Dexec.args="--runner=DirectRunner --expansionServiceURL=localhost:8097 --useExternal=false"
+
+Flink Runner
+
+    mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pflink-runner -Dexec.args="--runner=FlinkRunner --expansionServiceURL=localhost:8097 --useExternal=false"
+
+Spark Runner
+
+    mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pspark-runner -Dexec.args="--runner=SparkRunner --expansionServiceURL=localhost:8097 --useExternal=false"
+
+Java (Cross-language Pipeline)

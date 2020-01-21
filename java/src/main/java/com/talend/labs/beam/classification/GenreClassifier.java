@@ -1,6 +1,10 @@
 package com.talend.labs.beam.classification;
 
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
+
+import com.talend.labs.beam.classification.ClassificationPipeline.ClassificationPipelineOptions;
 import java.util.Random;
+import org.apache.beam.runners.core.construction.External;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.ParDo;
@@ -13,8 +17,16 @@ import org.apache.beam.sdk.values.PCollection;
  */
 public class GenreClassifier
     extends PTransform<PCollection<String>, PCollection<KV<String, String>>> {
+  private static final String URN = "talend:labs:ml:genreclassifier:python:v1";
 
-  public static GenreClassifier of() {
+  private ClassificationPipelineOptions options;
+
+  public GenreClassifier withClassificationPipelineOptions(ClassificationPipelineOptions options) {
+    this.options = options;
+    return this;
+  }
+
+  public static GenreClassifier create() {
     return new GenreClassifier();
   }
 
@@ -33,7 +45,13 @@ public class GenreClassifier
 
   @Override
   public PCollection<KV<String, String>> expand(PCollection<String> input) {
-    // TODO Replace this code with the code that invoke the python transform
-    return input.apply("RandomGenreClassifier", ParDo.of(new RandomGenreClassifierFn()));
+    checkArgument(this.options != null, "You must set the ClassificationPipelineOptions");
+    if (options.isUseExternal()) {
+      // TODO: Test passing arguments and PipelineOptions via External
+      input.apply(
+          "ExternalRandomGenreClassifier",
+          External.of(URN, new byte[] {}, options.getExpansionServiceURL()));
+    }
+    return input.apply(ParDo.of(new RandomGenreClassifierFn()));
   }
 }
