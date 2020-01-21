@@ -2,7 +2,7 @@ import apache_beam as beam
 import random
 
 
-class RandomGenreClassifierFn(beam.DoFn):
+class _RandomGenreClassifierFn(beam.DoFn):
     def process(self, element):
         random_classifier = random.randint(0, 10)
         if len(element) >= random_classifier:
@@ -16,4 +16,4 @@ class GenreClassifier(beam.PTransform):
         super(GenreClassifier, self).__init__()
 
     def expand(self, p):
-        return p | "RandomGenreClassifier" >> beam.ParDo(RandomGenreClassifierFn())
+        return p | "RandomGenreClassifier" >> beam.ParDo(_RandomGenreClassifierFn())

@@ -42,21 +42,56 @@ You can auto-format the code by running:
 
 # Execute code
 
-
 ## Java only
 
     cd java
 
-Direct Runner
+### Direct Runner
 
     mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pdirect-runner -Dexec.args="--runner=DirectRunner --expansionServiceURL=localhost:8097 --useExternal=false"
 
-Flink Runner
+### Flink Runner
 
     mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pflink-runner -Dexec.args="--runner=FlinkRunner --expansionServiceURL=localhost:8097 --useExternal=false"
 
-Spark Runner
+### Spark Runner
 
     mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pspark-runner -Dexec.args="--runner=SparkRunner --expansionServiceURL=localhost:8097 --useExternal=false"
 
-Java (Cross-language Pipeline)
+TODO
+
+## Python only
+
+### Direct Runner (Python)
+
+    python classificationpipeline.py --runner DirectRunner
+
+### Flink Runner
+
+Run the Portable Job Server from the main Beam git branch of the given version.
+Note: A docker image will be soon available.
+
+    ./gradlew :runners:flink:1.9:job-server:runShadow
+
+Starting with version 2.18 there is a docker image for the Job Server:
+
+    docker run -it -p 8097:8097 -p 8098:8098 -p 8099:8099 apachebeam/flink1.9_job_server:2.18.0
+
+Run the pipeline
+
+     python classificationpipeline.py --runner PortableRunner --job_endpoint localhost:8099 --environment_type=LOOPBACK
+
+### Spark Runner
+
+Run the Portable Job Server from the main Beam git branch of the given version.
+Note: A docker image will be soon available.
+
+    ./gradlew :runners:spark:job-server:runShadow
+
+Run the pipeline
+
+     python classificationpipeline.py --runner PortableRunner --job_endpoint localhost:8099 --environment_type=LOOPBACK
+
+## Cross-language Pipeline (Java calls python in the middle)
+
+TODO
