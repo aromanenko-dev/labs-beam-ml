@@ -73,13 +73,13 @@ Note: A docker image will be soon available.
 
     ./gradlew :runners:flink:1.9:job-server:runShadow
 
-Starting with version 2.18 there is a docker image for the Job Server:
+Starting with Beam version 2.18.0 there is a docker image for the Job Server:
 
-    docker run -it -p 8097:8097 -p 8098:8098 -p 8099:8099 apachebeam/flink1.9_job_server:2.18.0
+    docker run --net=host apachebeam/flink1.9_job_server:2.18.0
 
 Run the pipeline
 
-     python classificationpipeline.py --runner PortableRunner --job_endpoint localhost:8099 --environment_type=LOOPBACK
+    python classificationpipeline.py --runner PortableRunner --job_endpoint localhost:8099 --environment_type LOOPBACK
 
 ### Spark Runner
 
@@ -90,7 +90,7 @@ Note: A docker image will be soon available.
 
 Run the pipeline
 
-     python classificationpipeline.py --runner PortableRunner --job_endpoint localhost:8099 --environment_type=LOOPBACK
+     python classificationpipeline.py --runner PortableRunner --job_endpoint localhost:8099 --environment_type LOOPBACK
 
 ## Cross-language Pipeline (Java calls python in the middle)
 
