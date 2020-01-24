@@ -37,7 +37,7 @@ This code has only been tested with Python 3.7.x
     pip install -r requirements.txt
 
 You can auto-format the code by running:
-    
+
     black .
 
 # Execute code
@@ -68,12 +68,7 @@ TODO
 
 ### Flink Runner
 
-Run the Portable Job Server from the main Beam git branch of the given version.
-Note: A docker image will be soon available.
-
-    ./gradlew :runners:flink:1.9:job-server:runShadow
-
-Starting with Beam version 2.18.0 there is a docker image for the Job Server:
+Run the Portable Job Server from the docker image:
 
     docker run --net=host apachebeam/flink1.9_job_server:2.18.0
 
@@ -84,7 +79,7 @@ Run the pipeline
 ### Spark Runner
 
 Run the Portable Job Server from the main Beam git branch of the given version.
-Note: A docker image will be soon available.
+Note: A docker image will be available soon.
 
     ./gradlew :runners:spark:job-server:runShadow
 
