@@ -70,7 +70,7 @@ TODO
 
 Run the Portable Job Server from the docker image:
 
-    docker run --net=host apachebeam/flink1.9_job_server:2.18.0
+    docker run --net=host apache/beam_flink1.9_job_server:2.19.0
 
 Run the pipeline
 
