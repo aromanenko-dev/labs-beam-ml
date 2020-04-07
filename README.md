@@ -58,6 +58,21 @@ You can auto-format the code by running:
 
     mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pspark-runner -Dexec.args="--runner=SparkRunner --expansionServiceURL=localhost:8097 --useExternal=false"
 
+### Portable Spark Runner
+
+Run the Portable Job Server from the main Beam git branch of the given version.
+
+    ./gradlew :runners:spark:job-server:runShadow
+
+Build the pipeline
+    
+    mvn clean package -Pportable-runner
+    
+Run the pipeline
+
+    mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pportable-runner -Dexec.args="--runner=PortableRunner --jobEndpoint=localhost:8099"
+
+
 TODO
 
 ## Python only
