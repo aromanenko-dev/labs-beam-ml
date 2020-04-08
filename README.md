@@ -104,4 +104,19 @@ Run the pipeline
 
 ## Cross-language Pipeline (Java calls python in the middle)
 
-TODO
+### Portable Spark Runner
+
+Run the Portable Job Server from the main Beam git branch of the given version.
+
+    ./gradlew :runners:spark:job-server:runShadow
+
+Run the Expansion Service with user Python transform
+
+     python talend/labs/beam/ml/expansion_service.py -p 9097
+     
+Run the pipeline
+     
+     mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pportable-runner \
+        -Dexec.args="--runner=PortableRunner --jobEndpoint=localhost:8099 --useExternal=true --expansionServiceURL=localhost:9097"
+    
+    

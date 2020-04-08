@@ -15,7 +15,7 @@ public class ClassificationPipeline {
   private static class PrintFn<T> extends DoFn<T, T> {
     @ProcessElement
     public void processElement(@Element T element, OutputReceiver<T> out) {
-      System.out.println("JAVA, element: " + element);
+      System.out.println("JAVA OUTPUT: " + element);
       out.output(element);
     }
   }

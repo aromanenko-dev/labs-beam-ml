@@ -48,9 +48,12 @@ public class GenreClassifier
     checkArgument(this.options != null, "You must set the ClassificationPipelineOptions");
     if (options.isUseExternal()) {
       // TODO: Test passing arguments and PipelineOptions via External
-      input.apply(
-          "ExternalRandomGenreClassifier",
-          External.of(URN, new byte[] {}, options.getExpansionServiceURL()));
+      PCollection<KV<String, String>> output =
+          input.apply(
+              "ExternalRandomGenreClassifier",
+              External.of(URN, new byte[] {}, options.getExpansionServiceURL())
+                  .<KV<String, String>>withOutputType());
+      return output;
     }
     return input.apply(ParDo.of(new RandomGenreClassifierFn()));
   }
