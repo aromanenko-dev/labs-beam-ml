@@ -27,11 +27,11 @@ class _RandomGenreClassifierFn(beam.DoFn):
         # if len(element) >= random_classifier:
 
         if len(element) % 2:
-            print("PYTHON EXTERNAL: GenreA, " + element)
+            _LOGGER.info("PYTHON EXTERNAL: GenreA, " + element)
             return [("GenreA", element)]
         else:
-            print("PYTHON EXTERNAL: GenreB, " + element)
-            return [("GenreB", element)]
+            _LOGGER.info("PYTHON EXTERNAL: GenreB, " + element)
+        return [("GenreB", element)]
 
 @ptransform.PTransform.register_urn('talend:labs:ml:genreclassifier:python:v1', None)
 class GenreClassifier(ptransform.PTransform):
@@ -68,7 +68,7 @@ def main(unused_argv):
     beam_expansion_api_pb2_grpc.add_ExpansionServiceServicer_to_server(
         expansion_service.ExpansionServiceServicer(PipelineOptions()), server
     )
-    server.add_insecure_port('localhost:{}'.format(options.port))
+    server.add_insecure_port('0.0.0.0:{}'.format(options.port))
     server.start()
     _LOGGER.info('Listening for expansion requests at %d', options.port)
 
