@@ -34,7 +34,7 @@ This code has only been tested with Python 3.7.x
 ### Install the project dependencies
 
     cd python
-    pip install -r requirements.txt
+    :q!
 
 You can auto-format the code by running:
 
@@ -58,6 +58,21 @@ You can auto-format the code by running:
 
     mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pspark-runner -Dexec.args="--runner=SparkRunner --expansionServiceURL=localhost:8097 --useExternal=false"
 
+### Portable Spark Runner
+
+Run the Portable Job Server from the main Beam git branch of the given version.
+
+    ./gradlew :runners:spark:job-server:runShadow
+
+Build the pipeline
+    
+    mvn clean package -Pportable-runner
+    
+Run the pipeline
+
+    mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pportable-runner -Dexec.args="--runner=PortableRunner --jobEndpoint=localhost:8099"
+
+
 TODO
 
 ## Python only
@@ -70,7 +85,7 @@ TODO
 
 Run the Portable Job Server from the docker image:
 
-    docker run --net=host apachebeam/flink1.9_job_server:2.18.0
+    docker run --net=host apache/beam_flink1.9_job_server:2.19.0
 
 Run the pipeline
 
@@ -89,4 +104,19 @@ Run the pipeline
 
 ## Cross-language Pipeline (Java calls python in the middle)
 
-TODO
+### Portable Spark Runner
+
+Run the Portable Job Server from the main Beam git branch of the given version.
+
+    ./gradlew :runners:spark:job-server:runShadow
+
+Run the Expansion Service with user Python transform
+
+     python talend/labs/beam/ml/expansion_service.py -p 9097
+     
+Run the pipeline
+     
+     mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pportable-runner \
+        -Dexec.args="--runner=PortableRunner --jobEndpoint=localhost:8099 --useExternal=true --expansionServiceURL=localhost:9097"
+    
+    

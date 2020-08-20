@@ -1,5 +1,5 @@
-black==19.3b0
-cython==0.29.14
-ipython==7.11.1
+black==19.10b0
+cython==0.29.15
+ipython==7.12.0
 mypy==0.761
 pylint==2.4.4
