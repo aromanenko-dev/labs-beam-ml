@@ -22,7 +22,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class _RandomGenreClassifierFn(beam.DoFn):
     def process(self, element):
-        # TODO: random doesn't work for soem reasons
+        # TODO: random doesn't work for some reasons
         # random_classifier = randint(0, 10)
         # if len(element) >= random_classifier:
 
@@ -45,7 +45,7 @@ class GenreClassifier(ptransform.PTransform):
         return 'talend:labs:ml:genreclassifier:python:v1', None
 
     @staticmethod
-    def from_runner_api_parameter(unused_parameter, unused_context):
+    def from_runner_api_parameter(unused_ptransform, unused_parameter, unused_context):
         return GenreClassifier()
 
 
@@ -56,19 +56,35 @@ def cleanup(unused_signum, unused_frame):
     _LOGGER.info('Shutting down expansion service.')
     server.stop(None)
 
-
 def main(unused_argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--port',
-                        type=int,
-                        help='port on which to serve the job api')
+    parser.add_argument(
+        '-p', '--port', type=int, help='port on which to serve the job api')
     options = parser.parse_args()
     global server
     server = grpc.server(UnboundedThreadPoolExecutor())
+
+    # DOCKER SDK Harness
     beam_expansion_api_pb2_grpc.add_ExpansionServiceServicer_to_server(
-        expansion_service.ExpansionServiceServicer(PipelineOptions()), server
-    )
-    server.add_insecure_port('0.0.0.0:{}'.format(options.port))
+        expansion_service.ExpansionServiceServicer(
+            PipelineOptions(
+                ["--experiments", "beam_fn_api",
+                 "--sdk_location", "container"])),
+        server)
+
+    # PROCESS SDK Harness
+    # beam_expansion_api_pb2_grpc.add_ExpansionServiceServicer_to_server(
+    #     expansion_service.ExpansionServiceServicer(
+    #         PipelineOptions.from_dictionary({
+    #             'environment_type': 'PROCESS',
+    #             'environment_config': '{"command": "sdks/python/container/build/target/launcher/darwin_amd64/boot"}',
+    #             'experiments': 'beam_fn_api',
+    #             'sdk_location': 'container',
+    #         })
+    #     ), server
+    # )
+
+    server.add_insecure_port('localhost:{}'.format(options.port))
     server.start()
     _LOGGER.info('Listening for expansion requests at %d', options.port)
 
