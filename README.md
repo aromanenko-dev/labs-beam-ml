@@ -34,7 +34,7 @@ This code has only been tested with Python 3.7.x
 ### Install the project dependencies
 
     cd python
-    pip install -r requirements.txt
+    :q!
 
 You can auto-format the code by running:
 
