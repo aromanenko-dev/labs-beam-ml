@@ -22,18 +22,12 @@ _LOGGER = logging.getLogger(__name__)
 
 class _RandomGenreClassifierFn(beam.DoFn):
     def process(self, element):
-        # TODO: random doesn't work for some reasons
-        # random_classifier = randint(0, 10)
-        # if len(element) >= random_classifier:
-
         if len(element) % 2:
-            _LOGGER.info("PYTHON EXTERNAL: GenreA, " + element)
-            return [("GenreA", element)]
+            return [("Sci-Fi", element)]
         else:
-            _LOGGER.info("PYTHON EXTERNAL: GenreB, " + element)
-        return [("GenreB", element)]
+            return [("Drama", element)]
 
-@ptransform.PTransform.register_urn('talend:labs:ml:genreclassifier:python:v1', None)
+@ptransform.PTransform.register_urn('genreclassifier:python:v1', None)
 class GenreClassifier(ptransform.PTransform):
     def __init__(self):
         super(GenreClassifier, self).__init__()
@@ -42,7 +36,7 @@ class GenreClassifier(ptransform.PTransform):
         return pcoll | "RandomGenreClassifier" >> beam.ParDo(_RandomGenreClassifierFn())
 
     def to_runner_api_parameter(self, unused_context):
-        return 'talend:labs:ml:genreclassifier:python:v1', None
+        return 'genreclassifier:python:v1', None
 
     @staticmethod
     def from_runner_api_parameter(unused_ptransform, unused_parameter, unused_context):

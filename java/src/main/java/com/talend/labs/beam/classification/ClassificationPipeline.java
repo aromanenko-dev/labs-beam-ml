@@ -10,8 +10,13 @@ import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClassificationPipeline {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GenreClassifier.class);
+
   private static class PrintFn<T> extends DoFn<T, T> {
     @ProcessElement
     public void processElement(@Element T element, OutputReceiver<T> out) {
@@ -39,14 +44,23 @@ public class ClassificationPipeline {
         PipelineOptionsFactory.fromArgs(args)
             .withValidation()
             .as(ClassificationPipelineOptions.class);
-    System.out.println("ClassificationPipelineOptions: " + options);
+    LOG.info("PipelineOptions: " + options);
 
+    // Create pipeline
     Pipeline p = Pipeline.create(options);
-    PCollection<String> names = p.apply(Create.of("Maria", "John", "Xavier", "Erika"));
+
+    // Simple input dataset
+    PCollection<String> movies =
+        p.apply(Create.of("Matrix", "Star Wars", "Forrest Gump", "Terminator"));
+
+    // Classifier PTransform
     PCollection<KV<String, String>> genres =
-        names.apply(GenreClassifier.create().withClassificationPipelineOptions(options));
+        movies.apply(GenreClassifier.create().withClassificationPipelineOptions(options));
+
+    // Output results
     genres.apply(ParDo.of(new PrintFn()));
 
+    // Run pipeline
     p.run().waitUntilFinish();
   }
 }
