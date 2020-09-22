@@ -27,7 +27,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <beam.version>2.19.0</beam.version>
+        <beam.version>2.24.0</beam.version>
         <spark.version>2.4.4</spark.version>
         <spark.jackson.version>2.6.7.1</spark.jackson.version>
 
@@ -56,6 +56,12 @@
             <dependency>
                 <groupId>org.apache.beam</groupId>
                 <artifactId>beam-runners-core-construction-java</artifactId>
+                <version>${beam.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.beam</groupId>
+                <artifactId>beam-runners-java-fn-execution</artifactId>
                 <version>${beam.version}</version>
             </dependency>
 
@@ -97,6 +103,13 @@
 
             <dependency>
                 <groupId>org.apache.beam</groupId>
+                <artifactId>beam-runners-portability-java</artifactId>
+                <version>${beam.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.beam</groupId>
                 <artifactId>beam-runners-spark</artifactId>
                 <version>${beam.version}</version>
                 <scope>runtime</scope>
@@ -132,6 +145,11 @@
 
         <dependency>
             <groupId>org.apache.beam</groupId>
+            <artifactId>beam-runners-java-fn-execution</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.beam</groupId>
             <artifactId>beam-runners-direct-java</artifactId>
         </dependency>
 
@@ -154,7 +172,6 @@
                 <dependency>
                     <groupId>org.apache.beam</groupId>
                     <artifactId>beam-runners-portability-java</artifactId>
-                    <version>${beam.version}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -165,6 +182,7 @@
                 <dependency>
                     <groupId>org.apache.beam</groupId>
                     <artifactId>beam-runners-direct-java</artifactId>
+                    <scope>runtime</scope>
                 </dependency>
             </dependencies>
         </profile>
