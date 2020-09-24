@@ -162,3 +162,5 @@ dmypy.json
 # Visual Studio Code
 .vscode/
 
+# Eclipse
+.classpath

@@ -24,7 +24,7 @@ public class PythonTransform extends PTransform<PCollection<String>, PCollection
     PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
     Pipeline p = Pipeline.create(options);
     PCollection<String> names =
-        p.apply(Create.of("Maria", "John", "Xavier", "Erika")).apply(new PythonTransform());
+        p.apply(Create.of("Maria")).apply(new PythonTransform()); //, "John", "Xavier", "Erika"
     p.run().waitUntilFinish();
     //    InvokeDoFn invokeDoFn = new InvokeDoFn();
     //    invokeDoFn.setup();

@@ -109,7 +109,12 @@ class InvokeDoFn extends DoFn<String, String> {
             .build();
 
     // Create python environment
-    String command = "python";
+    //    String command = "echo";
+    String command =
+        //        "source /home/ismael/.virtualenvs/python3/beam-2.24.0/bin/activate; "
+        ""
+            + "/home/ismael/workspace/beam4/sdks/python/container/py38/build/target/launcher/linux_amd64/boot";
+    //    run apache/beam_python3.8_sdk:2.24.0
     Map<String, String> env = Collections.emptyMap();
     Environment environment = Environments.createProcessEnvironment("", "", command, env);
 
@@ -167,7 +172,8 @@ class InvokeDoFn extends DoFn<String, String> {
   protected transient FnDataReceiver<WindowedValue<byte[]>> mainInputReceiver;
   /** Handler for state requests. */
   // TODO Unsupported
-  private final transient StateRequestHandler stateRequestHandler = StateRequestHandler.unsupported();
+  private final transient StateRequestHandler stateRequestHandler =
+      StateRequestHandler.unsupported();
   /**
    * A bundle handler for handling input elements by forwarding them to a remote environment for
    * processing. It holds a collection of {@link FnDataReceiver}s which actually perform the data
