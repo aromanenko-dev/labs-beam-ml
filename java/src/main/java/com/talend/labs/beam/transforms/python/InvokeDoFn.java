@@ -3,8 +3,10 @@ package com.talend.labs.beam.transforms.python;
 import static org.apache.beam.runners.core.construction.BeamUrns.getUrn;
 import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkNotNull;
 
+import avro.shaded.com.google.common.collect.Lists;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +17,7 @@ import org.apache.beam.model.pipeline.v1.RunnerApi;
 import org.apache.beam.model.pipeline.v1.RunnerApi.Environment;
 import org.apache.beam.model.pipeline.v1.RunnerApi.ExecutableStagePayload.WireCoderSetting;
 import org.apache.beam.runners.core.construction.Environments;
+import org.apache.beam.runners.core.construction.ModelCoders;
 import org.apache.beam.runners.core.construction.PipelineOptionsTranslation;
 import org.apache.beam.runners.core.construction.graph.ExecutableStage;
 import org.apache.beam.runners.core.construction.graph.ImmutableExecutableStage;
@@ -35,12 +38,14 @@ import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.fn.data.FnDataReceiver;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.options.PortablePipelineOptions;
+import org.apache.beam.sdk.schemas.FieldAccessDescriptor.FieldDescriptor;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.windowing.BoundedWindow;
 import org.apache.beam.sdk.transforms.windowing.GlobalWindow;
 import org.apache.beam.sdk.util.WindowedValue;
 import org.apache.beam.vendor.grpc.v1p26p0.com.google.protobuf.ByteString;
 import org.apache.beam.vendor.grpc.v1p26p0.com.google.protobuf.Struct;
+import org.apache.beam.vendor.grpc.v1p26p0.com.google.protobuf.Value;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.Iterables;
 
 /** Inspired by Flink's BeamPythonStatelessFunctionRunner and Beam's SparkExecutableStageFunction */
@@ -85,35 +90,34 @@ class InvokeDoFn extends DoFn<String, String> {
                     .setSpec(
                         RunnerApi.FunctionSpec.newBuilder()
                             .setUrn(functionUrn)
-                            .setPayload(functionPayload))
+                            .setPayload(
+                                org.apache.beam.vendor.grpc.v1p26p0.com.google.protobuf.ByteString
+                                    .copyFrom(getUserDefinedFunctionsProtoBytes()))
+                            .build())
+                    .putInputs(MAIN_INPUT_NAME, INPUT_ID)
+                    .putOutputs(MAIN_OUTPUT_NAME, OUTPUT_ID)
                     .build())
-            //                                                    .putInputs(MAIN_INPUT_NAME,
-            // INPUT_ID)
-            //                                                    .putOutputs(MAIN_OUTPUT_NAME,
-            // OUTPUT_ID)
-            //                                                    .build())
-            //                                    .putWindowingStrategies(
-            //                                            WINDOW_STRATEGY,
-            //                                            RunnerApi.WindowingStrategy.newBuilder()
-            //                                                    .setWindowCoderId(WINDOW_CODER_ID)
-            //                                                    .build())
-            //                                    .putCoders(
-            //                                            INPUT_CODER_ID,
-            //                                            getInputCoderProto())
-            //                                    .putCoders(
-            //                                            OUTPUT_CODER_ID,
-            //                                            getOutputCoderProto())
-            //                                    .putCoders(
-            //                                            WINDOW_CODER_ID,
-            //                                            getWindowCoderProto())
+            .putWindowingStrategies(
+                WINDOW_STRATEGY,
+                RunnerApi.WindowingStrategy.newBuilder().setWindowCoderId(WINDOW_CODER_ID).build())
+            .putCoders(INPUT_CODER_ID, getInputCoderProto())
+            .putCoders(OUTPUT_CODER_ID, getOutputCoderProto())
+            .putCoders(
+                WINDOW_CODER_ID,
+                RunnerApi.Coder.newBuilder()
+                    .setSpec(
+                        RunnerApi.FunctionSpec.newBuilder()
+                            .setUrn(ModelCoders.GLOBAL_WINDOW_CODER_URN)
+                            .build())
+                    .build())
             .build();
 
     // Create python environment
     //    String command = "echo";
     String command =
         //        "source /home/ismael/.virtualenvs/python3/beam-2.24.0/bin/activate; "
-        ""
-            + "/home/ismael/workspace/beam4/sdks/python/container/py38/build/target/launcher/linux_amd64/boot";
+        //        "/home/ismael/.virtualenvs/python3/beam-2.24.0/bin/activate && "
+        "/home/ismael/workspace/beam4/sdks/python/container/py38/build/target/launcher/linux_amd64/boot";
     //    run apache/beam_python3.8_sdk:2.24.0
     Map<String, String> env = Collections.emptyMap();
     Environment environment = Environments.createProcessEnvironment("", "", command, env);
@@ -139,6 +143,35 @@ class InvokeDoFn extends DoFn<String, String> {
         transforms,
         outputs,
         createValueOnlyWireCoderSetting());
+  }
+
+  private static byte[] getUserDefinedFunctionsProtoBytes() {
+    //      return this.userDefinedFunctions.toByteArray();
+    String code = "import apache_beam as beam" + System.lineSeparator() +
+    "class _RandomGenreClassifierFn(beam.DoFn):" + System.lineSeparator() +
+    "\t" + "def process(self, element):" + System.lineSeparator() +
+//    "print(element)
+    "\t\t" + "return element" + System.lineSeparator() +
+    System.lineSeparator() +
+    "class GenreClassifier(beam.PTransform):" + System.lineSeparator() +
+    "\t" + "def __init__(self):" + System.lineSeparator() +
+    "\t\t" + "super(GenreClassifier, self).__init__()" + System.lineSeparator() +
+    "\t" + "def expand(self, p):" + System.lineSeparator() +
+    "\t\t" + "return p | \"RandomGenreClassifier\" >> beam.ParDo(_RandomGenreClassifierFn())"
+            ;
+
+    return code.getBytes(StandardCharsets.UTF_8);
+  }
+
+  private static RunnerApi.Coder getInputCoderProto() {
+    return RunnerApi.Coder.newBuilder()
+        .setSpec(
+            RunnerApi.FunctionSpec.newBuilder().setUrn(ModelCoders.STRING_UTF8_CODER_URN).build())
+        .build();
+  }
+
+  private static RunnerApi.Coder getOutputCoderProto() {
+    return getInputCoderProto();
   }
 
   private static Collection<WireCoderSetting> createValueOnlyWireCoderSetting() throws IOException {
@@ -195,11 +228,21 @@ class InvokeDoFn extends DoFn<String, String> {
       String retrievalToken = "retrievalToken";
       PortablePipelineOptions portableOptions =
           PipelineOptionsFactory.as(PortablePipelineOptions.class);
+      portableOptions.setSdkWorkerParallelism(1);
+      portableOptions.setFilesToStage(Lists.newArrayList("/tmp/beamtostage/file1"));
+
       Struct pipelineOptions = PipelineOptionsTranslation.toProto(portableOptions);
+      // TODO hack around BEAM-XXXXX
+      Struct pipelineOptions2 =
+          pipelineOptions.toBuilder()
+              .putFields(
+                  "beam:option:save_main_session", Value.newBuilder().setBoolValue(true).build())
+              .build();
+      System.out.println(pipelineOptions2);
       // one operator has one Python SDK harness
       JobBundleFactory jobBundleFactory =
           DefaultJobBundleFactory.create(
-              JobInfo.create(taskName, taskName, retrievalToken, pipelineOptions));
+              JobInfo.create(taskName, taskName, retrievalToken, pipelineOptions2));
       StageBundleFactory stageBundleFactory = jobBundleFactory.forStage(executableStage);
       // TODO this is the one who deals with metrics
       BundleProgressHandler progressHandler = BundleProgressHandler.ignored();
