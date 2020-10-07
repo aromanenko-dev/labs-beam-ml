@@ -117,6 +117,6 @@ Run the Expansion Service with user Python transform
 Run the pipeline
      
      mvn exec:java -Dexec.mainClass=com.talend.labs.beam.classification.ClassificationPipeline -Pportable-runner \
-        -Dexec.args="--runner=PortableRunner --jobEndpoint=localhost:8099 --useExternal=true --expansionServiceURL=localhost:9097"
+        -Dexec.args="--runner=PortableRunner --jobEndpoint=localhost:8099 --useExternal=true --expansionServiceURL=localhost:9097 --experiments=beam_fn_api"
     
     
